@@ -8,11 +8,12 @@ cp -avf "/ctx/system_files"/. /
 # DNF5 Speedup
 sed -i '/^\[main\]/a max_parallel_downloads=10' /etc/dnf/dnf.conf
 
-# 1. Abilitazione del repository COPR ufficiale per DankMaterialShell (DMS)
+# 1. Abilitazione del repository COPR per DankMaterialShell (DMS) e llama-cpp
 echo "--- Abilitazione COPR per DMS ---"
 dnf -y install dnf-plugins-core
 dnf copr enable -y avengemedia/danklinux
 dnf copr enable -y avengemedia/dms
+dnf copr enable -y sneed/llama-cpp-vulkan
 
 # 2. Installazione dei pacchetti richiesti
 echo "--- Installazione pacchetti di sistema ---"
@@ -20,7 +21,9 @@ echo "--- Installazione pacchetti di sistema ---"
 dnf install -y \
     wayland-utils \
     xdg-desktop-portal \
+    xdg-desktop-portal-gtk \
     xdg-desktop-portal-gnome \
+    gnome-keyring \
     lxpolkit \
     xdg-utils \
     xorg-x11-server-Xwayland
@@ -45,7 +48,10 @@ dnf install -y \
     NetworkManager \
     NetworkManager-wifi \
     linux-firmware \
-    iwlxxway-firmware \
+    iwlwifi-mvm-firmware \
+    iwlwifi-dvm-firmware \
+    iwlwifi-mld-firmware \
+    iwlegacy-firmware \
     bluez \
     bluez-utils \
     blueman
@@ -87,6 +93,9 @@ dnf install -y \
     containerd.io \
     docker-buildx-plugin \
     docker-compose-plugin
+# --- LLAMA-CPP ---
+dnf install -y \
+    docker \
 
 # 3. Abilitazione dei servizi di sistema essenziali
 systemctl enable NetworkManager.service
@@ -121,7 +130,32 @@ systemctl enable --force greetd.service
 mkdir -p /etc/skel/.config/systemd/user/graphical-session.target.wants
 ln -s /usr/lib/systemd/user/dms.service /etc/skel/.config/systemd/user/graphical-session.target.wants/
 
-# 7. Pulizia della cache per ridurre il peso dell'immagine finale
+# 7. Installazione di NetBird
+curl -Lo /etc/yum.repos.d/netbird.repo https://netbird.io
+dnf -y install netbird
+systemctl enable netbird.service
+
+# 8. Installa il pacchetto Flatpak di sistema
+dnf -y install flatpak
+flatpak remote-add --system --if-not-exists flathub https://flathub.org
+if flatpak remote-list | grep -q "fedora"; then
+    flatpak remote-delete fedora
+fi
+
+# 8. CONFIGURAZIONE XDG DESKTOP PORTALS PER NIRI ---
+mkdir -p /etc/skel/.config/xdg-desktop-portal
+cat > /etc/skel/.config/xdg-desktop-portal/niri-portals.conf << 'EOF'
+[preferred]
+# Di base usa il portale GTK per selettori di file e dialoghi generici
+default=gtk
+
+# Usa esplicitamente il backend GNOME per lo screencast (condivisione schermo) e le impostazioni di sistema
+org.freedesktop.impl.portal.ScreenCast=gnome
+org.freedesktop.impl.portal.Settings=gnome
+EOF
+ln -sf niri-portals.conf /etc/skel/.config/xdg-desktop-portal/portals.conf
+
+# 9. Pulizia della cache per ridurre il peso dell'immagine finale
 dnf clean all
 rm -rf /run/dnf /run/selinux-policy
 rm -rf /var/lib/dnf
