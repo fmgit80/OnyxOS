@@ -131,9 +131,9 @@ mkdir -p /etc/skel/.config/systemd/user/graphical-session.target.wants
 ln -s /usr/lib/systemd/user/dms.service /etc/skel/.config/systemd/user/graphical-session.target.wants/
 
 # 7. Installazione di NetBird
-curl -Lo /etc/yum.repos.d/netbird.repo https://netbird.io
-dnf -y install netbird
-systemctl enable netbird.service
+#curl -Lo /etc/yum.repos.d/netbird.repo https://netbird.io
+#dnf -y install netbird
+#systemctl enable netbird.service
 
 # 8. Installa il pacchetto Flatpak di sistema
 dnf -y install flatpak
