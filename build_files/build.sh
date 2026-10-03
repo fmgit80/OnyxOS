@@ -53,7 +53,7 @@ dnf install -y \
     iwlwifi-mld-firmware \
     iwlegacy-firmware \
     bluez \
-    bluez-utils \
+    bluez-tools \
     blueman
 # --- DESKTOP ENVIRONMENT (NIRI + DMS) ---
 dnf install -y \
