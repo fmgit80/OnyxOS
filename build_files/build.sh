@@ -78,7 +78,7 @@ dnf install -y \
     podman \
     podman-compose
 # --- DOCKER ---
-dnf config-manager --add-repo https://download.docker.com/linux/fedora/docker-ce.repo
+dnf config-manager addrepo --from-repofile https://download.docker.com/linux/fedora/docker-ce.repo
 dnf remove -y docker \
     docker-client \
     docker-client-latest \
@@ -95,7 +95,7 @@ dnf install -y \
     docker-compose-plugin
 # --- LLAMA-CPP ---
 dnf install -y \
-    docker \
+    llama-cpp \
 
 # 3. Abilitazione dei servizi di sistema essenziali
 systemctl enable NetworkManager.service
